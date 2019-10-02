@@ -31,7 +31,15 @@ ENV GRPCGW_VER 1.11.2
 RUN go get github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v${GRPCGW_VER} && \
     go get github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${GRPCGW_VER} && \
     mkdir -p /go/src/github.com/grpc-ecosystem && \
-    ln -s /go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v${GRPCGW_VER} /go/src/github.com/grpc-ecosystem/grpc-gateway && \
-    find /go -type d -exec chmod 755 {} \; && find /go/pkg -type f -exec chmod 644 {} \;
+    ln -s /go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v${GRPCGW_VER} /go/src/github.com/grpc-ecosystem/grpc-gateway
+
+# Install go-proto-validators.
+ENV GOVALIDATORS_VER 0.2.0
+RUN go get github.com/mwitkow/go-proto-validators/protoc-gen-govalidators@v${GOVALIDATORS_VER} && \
+    mkdir -p /go/src/github.com/mwitkow && \
+    ln -s /go/pkg/mod/github.com/mwitkow/go-proto-validators@v${GOVALIDATORS_VER} /go/src/github.com/mwitkow/go-proto-validators
+
+# Fix permissions to allow for non-root users.
+RUN find /go -type d -exec chmod 755 {} \; && find /go/pkg -type f -exec chmod 644 {} \;
 
 ENTRYPOINT ["protoc", "-I.", "-I/usr/local/include", "-I/go/src", "-I/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis"]
